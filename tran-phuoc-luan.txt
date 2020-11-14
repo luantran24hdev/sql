@@ -1,0 +1,163 @@
+1.	Cho biết danh sách các đối tác cung cấp hàng cho công ty
+    SELECT TENCONGTY FROM nhacungcap
+
+
+2.	Mã hàng, tên hàng và số lượng của các mặt hàng hiện có trong công ty
+
+    SELECT MAHANG,TENHANG,SOLUONG FROM mathang
+
+
+3.	Họ tên, địa chỉ và năm bắt đầu làm việc của các nhân viên trong cty
+
+    SELECT HO,TEN,DIACHI,NGAYLAMVIEC FROM nhanvien
+
+4.	Địa chỉ, điện thoại của nhà cung cấp có tên giao dịch VINAMILK
+
+    SELECT DIACHI,DIENTHOAI FROM nhacungcap WHERE DIACHI = 'Hà Nội'
+
+5.	Mã và tên của các mặt hàng có giá trị lớn hơn 100000 và số lượng hiện có ít hơn 50
+
+    SELECT m.MAHANG, m.TENHANG FROM mathang AS m WHERE m.GIAHANG > 100000 AND m.SOLUONG < 50
+
+6.	Cho biết mỗi mặt hàng trong công ty do ai cung cấp
+
+    SELECT m.TENHANG, n.TENCONGTY 
+    FROM mathang AS m, nhacungcap As n
+
+7.	Công ty Việt Tiến đã cung cấp những mặt hàng nào
+
+
+    SELECT TENHANG FROM mathang 
+    WHERE NHACUNGCAP_MACONGTY = 'MVT'
+
+8.	Loại hàng thực phẩm do những công ty nào cung cấp, địa chỉ của công ty đó
+
+
+
+    SELECT n.DIACHI, n.TENCONGTY 
+    FROM loaihang AS l, nhacungcap AS n WHERE l.MALOAIHANG = 'TP'
+
+9.	Những khách hàng nào (tên giao dịch)(khachhang ) đã đặt mua mặt hàng(mathang) sữa hộp của công ty
+    SELECT k.TENGIAODICH 
+    FROM khachhang AS k, mathang AS m WHERE m.TENHANG = 'SUA HOP'
+
+10.	Đơn đặt hàng số 1(dondadat) do ai đặt(khachhang) và do nhân viên nào lập(nhanvien), 
+thời gian và địa điểm giao hàng là ở đâu(dondadat)
+
+SELECT k.TENGIAODICH,k.DIACHI,d.NGAYDATHANG,d.NOIGIAOHANG 
+FROM dondathang AS d, khachhang AS k WHERE d.KHACHHANG_MAKHACHHANG = k.MAKHACHHANG AND d.NOIGIAOHANG = 'huế'
+
+
+
+11.	Hãy cho biết số tiền lương mà công ty phải trả cho mỗi nhân viên là bao nhiêu (lương=lương cơ bản+phụ cấp)
+
+SELECT nhanvien.HO, nhanvien.TEN, nhanvien.LUONGCOBAN + nhanvien.LUONGPHUCAP FROM nhanvien
+13.	Hãy cho biết có những khách hàng nào lại chính là đối tác cung cấp hàng cho công ty (tức là có cùng tên giao dịch)
+
+SELECT k.TENGIAODICH 
+FROM khachhang AS k,nhacungcap AS n WHERE k.TENGIAODICH = n.TENGIAODICH
+
+
+14.	Trong công ty có những nhân viên nào có cùng ngày sinh
+
+
+SELECT a.HO,a.TEN,b.HO,b.TEN,b.NGAYSINH FROM nhanvien a 
+INNER JOIN nhanvien b ON a.ngaysinh = b.ngaysinh AND a.MANHANVIEN <> b.MANHANVIEN
+
+
+15.	Những đơn hàng nào yêu cầu giao hàng ngay tại công ty đặt hàng và những đơn đó là của công ty nào
+
+
+16.	Cho biết tên công ty, tên giao dịch, địa chỉ và điện thoại của các khách hàng và nhà cung cấp hàng cho công ty
+
+SELECT n.TENCONGTY, n.TENGIAODICH, n.DIACHI, n.DIENTHOAI, k.TENGIAODICH, k.DIACHI, k.DIENTHOAI, k.DIACHI 
+FROM nhacungcap AS n, khachhang AS k
+
+
+17.	Những mặt hàng nào chưa từng được khách hàng đặt mua
+
+ 
+
+
+
+
+
+
+19.	Những nhân viên nào của công ty có lương cơ bản cao nhất\
+    SELECT n.HO, n.TEN, MAX(LUONGCOBAN) FROM nhanvien AS n
+
+
+20.	Tổng số tiền mà khách hàng phải trả cho mỗi đơn đặt hàng là bao nhiêu
+
+
+21.	Trong năm 2006 những mặt hàng nào đặt mua đúng mộ lần
+
+
+22.	Mỗi khách hàng phải bỏ ra bao nhiêu tiền để đặt mua hàng của công ty
+
+
+
+28.	Đơn đặt hàng nào có số lượng hàng được đặt mua ít nhất
+SELECT DONDATHANG_SOHOADON FROM chitietdathang AS c WHERE c.SOLUONG = 2
+
+
+
+29.	Số tiền nhiều nhất mà khách hàng đã từng bỏ ra để đặt hàng trong các đơn đặt hàng là bao nhiêu
+
+SELECT GIABAN FROM chitietdathang AS c WHERE c.ID = 4
+
+
+30.	Mỗi một đơn đặt hàng đặt(dondathang) mua những mặt hàng(mathang) nào và tổng số tiền(mathang) của đơn đặt hàng
+
+
+
+
+31.	Mỗi một loại hàng bao gồm những mặt hàng nào(mathang), tổng số lượng của mỗi loại 
+và tổng số lượng của tất cả các mặt hàng hiện có trong cty
+
+
+
+
+33.	Cập nhật lại giá thị trường NGAYCHUYENHANG của những bản ghi có NGAYCHUYENHANG 
+chưa xác định (NULL) trong bảng DONDATHANG bằng với giá trị của trường NGAYDATHANG
+
+UPDATE dondathang SET NGAYCHUYENHANG = NGAYDATHANG WHERE NGAYCHUYENHANG = '0000-00-00'
+
+
+
+
+34.	Tăng số lượng hàng của những mặt hàng do công ty VINAMILK cung cấp lên gấp đôi
+
+UPDATE mathang SET SOLUONG = SOLUONG * 2 WHERE NHACUNGCAP_MACONGTY = 'VNM'
+
+
+35.Cập nhật giá trị của trường NOIGIAOHANG trong bảng DONDATHANG bằng địa chỉ của khách hàng 
+đối với những đơn đặt hàng chưa xác định được nơi giao hàng (giá trị trường NOIGIAOHANG bằng NULL).
+
+Đề bài đã cập nhật đầy đủ, Không có giá trị null
+
+
+36.	Cập nhật lại dữ liệu trong bảng KHACHHANG sao cho nếu tên công ty và tên giao dịch của khách hàng
+ trùng với tên công ty và tên giao dịch của một nhà cung cấp nào đó thì địa chỉ, điện thoại, fax và e-mail phải giống nhau.
+
+
+ Đề bài đã cập nhật dữ liệu rồi
+
+
+ 37. Tăng lương lên gấp rưỡi cho những nhân viên bán được số lượng hàng nhiều hơn 100 trong năm 2003.
+
+
+ UPDATE nhanvien, chitietdathang AS c SET LUONGCOBAN = LUONGCOBAN * 3 WHERE SOLUONG > 100
+
+ 38. Tăng phụ cấp lên bằng 50% lương cho những nhân viên bán được hàng nhiều nhất.
+
+    UPDATE nhanvien,dondathang AS d SET LUONGPHUCAP = (LUONGPHUCAP * 25)/100 WHERE d.NHANVIEN_MANHANVIEN = 'H003'
+
+ 39. Giảm 25% lương của những nhân viên trong năm 2003 không lập được bất kỳ đơn đặt hàng nào.
+
+ Không hiểu Đề
+
+
+ Thực hiện các yêu cầu dưới đây bằng câu lệnh DELETE.
+
+41. Xoá khỏi bảng NHANVIEN những nhân viên đã làm việc trong công ty quá 40 năm.
