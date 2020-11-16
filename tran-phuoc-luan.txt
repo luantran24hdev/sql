@@ -67,9 +67,6 @@ SELECT k.TENGIAODICH AS TENKHACHHANG
 FROM khachhang AS k,nhacungcap AS n WHERE k.TENGIAODICH = n.TENGIAODICH
 
 
-
-
------ Bắt đầu câu 14 khi tiếp tục ..... ------
 14.	Trong công ty có những nhân viên nào có cùng ngày sinh
 
 
@@ -81,6 +78,8 @@ INNER JOIN nhanvien b ON a.ngaysinh = b.ngaysinh AND a.MANHANVIEN <> b.MANHANVIE
 
 SELECT SOHOADON,TENCONGTY,TENGIAODICH 
 FROM dondathang INNER JOIN khachhang ON dondathang.NOIGIAOHANG = khachhang.DIACHI
+
+
 16.	Cho biết tên công ty, tên giao dịch, địa chỉ và điện thoại của các khách hàng và nhà cung cấp hàng cho công ty
 
 SELECT n.TENCONGTY, n.TENGIAODICH, n.DIACHI, n.DIENTHOAI, k.TENGIAODICH, k.DIACHI, k.DIENTHOAI, k.DIACHI 
@@ -91,7 +90,8 @@ FROM nhacungcap AS n, khachhang AS k
 
  
 
-SELECT TENHANG,MAHANG FROM mathang
+SELECT TENHANG AS TENHANGCHUADUOCDAT,MAHANG 
+FROM mathang  
  WHERE NOT EXISTS(SELECT MATHANG_MAHANG FROM chitietdathang WHERE MATHANG_MAHANG = mathang.MAHANG)
 
 
@@ -111,36 +111,46 @@ SELECT TENHANG,MAHANG FROM mathang
 
 
 23.Mỗi nhân viên của công ty đã lập bao nhiêu đơn đặt hàng (nếu chưa hề lập hóa đơn nào thì cho kết quả là 0)
- SELECT nhanvien.MANHANVIEN,ho,ten,COUNT(SOHOADON) 
+ SELECT nhanvien.MANHANVIEN,ho,ten,COUNT(SOHOADON) AS SOHOADONDATHANG
  FROM nhanvien LEFT JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN 
  GROUP BY nhanvien.MANHANVIEN,ho,ten
 
-24.Tổng số tiền hàng mà công ty thu được trong mỗi tháng của năm 2006 (thời gianđược tính theo ngày đặt hàng)
+24.Tổng số tiền hàng mà công ty thu được trong mỗi tháng của năm 2006 (thời gian được tính theo ngày đặt hàng)
 
 
 25.Tông số tiền lời mà công ty thu được từ mỗi mặt hàng trong năm 2006
 
+    SELECT c.MAHANG, c.TENHANG, SUM(b.SOLUONG*b.GIABAN-b.SOLUONG*b.GIABAN*b.MUCGIAMGIA/100)- SUM(b.SOLUONG*b.GIABAN) FROM (dondathang AS a INNER JOIN chitietdathang AS b ON a.SOHOADON = b.DONDATHANG_SOHOADON) INNER JOIN mathang AS c ON b.MATHANG_MAHANG = c.MAHANG WHERE YEAR(ngaydathang) = 2006 GROUP BY c.MAHANG,c.TENHANG
+
+
 
 26.Số lượng hàng còn lại của mỗi mặt hàng mà công ty đã có (tổng số lượng hànghiện có và đã bán)
 
+    SELECT mathang.LOAIHANG_MALOAIHANG,tenhang, mathang.SOLUONG + CASE 
+    WHEN SUM(chitietdathang.SOLUONG) IS NULL THEN 0 ELSE SUM(chitietdathang.SOLUONG) 
+    END AS tongsoluong FROM mathang LEFT OUTER JOIN chitietdathang 
+    ON mathang.MAHANG=chitietdathang.MATHANG_MAHANG GROUP BY mathang.MAHANG,tenhang,mathang.SOLUONG
 
 27.Nhân viên nào của công ty bán được số lượng hàng nhiều nhất và số lượng hàngbán được của mhữmg nhân viên này là bao nhiêu
 
-    SELECT nhanvien.MANHANVIEN,ho,ten,sum(SOLUONG) AS TONGSOLUONG FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
+    SELECT nhanvien.MANHANVIEN,ho,ten,sum(SOLUONG) AS TONGSOLUONG 
+
+
+    FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
     INNER JOIN chitietdathang ON dondathang.SOHOADON=chitietdathang.DONDATHANG_SOHOADON 
     GROUP BY nhanvien.MANHANVIEN,ho,ten HAVING sum(soluong)>=ALL(SELECT sum(SOLUONG) FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
     INNER JOIN chitietdathang ON dondathang.SOHOADON=chitietdathang.DONDATHANG_SOHOADON GROUP BY nhanvien.MANHANVIEN,ho,ten)
 
 28.	Đơn đặt hàng nào có số lượng hàng được đặt mua ít nhất
-SELECT DONDATHANG_SOHOADON 
-FROM chitietdathang AS c 
-WHERE c.SOLUONG = 2
+    SELECT DONDATHANG_SOHOADON AS DONDATHANG
+    FROM chitietdathang AS c 
+    WHERE c.SOLUONG = 2
 
 
 
 29.	Số tiền nhiều nhất mà khách hàng đã từng bỏ ra để đặt hàng trong các đơn đặt hàng là bao nhiêu
 
-SELECT GIABAN FROM chitietdathang AS c WHERE c.ID = 4
+SELECT GIABAN AS GIATRIDONHANG FROM chitietdathang AS c WHERE c.ID = 4
 
 
 30.	Mỗi một đơn đặt hàng đặt(dondathang) mua những mặt hàng(mathang) nào và tổng số tiền(mathang) của đơn đặt hàng
@@ -172,20 +182,30 @@ UPDATE mathang SET SOLUONG = SOLUONG * 2 WHERE NHACUNGCAP_MACONGTY = 'VNM'
 35.Cập nhật giá trị của trường NOIGIAOHANG trong bảng DONDATHANG bằng địa chỉ của khách hàng 
 đối với những đơn đặt hàng chưa xác định được nơi giao hàng (giá trị trường NOIGIAOHANG bằng NULL).
 
-Đề bài đã cập nhật đầy đủ, Không có giá trị null
+UPDATE d.NOIGIAOHANG 
+SET d.NOIGIAOHANG = k.DIACHI
+FROM khachhang AS k, dondathang AS d
+WHERE d.KHACHHANG_MAKHACHHANG = k.MAKHACHHANG 
+AND d.NOIGIAOHANG IS NULL
 
 
 36.	Cập nhật lại dữ liệu trong bảng KHACHHANG sao cho nếu tên công ty và tên giao dịch của khách hàng
  trùng với tên công ty và tên giao dịch của một nhà cung cấp nào đó thì địa chỉ, điện thoại, fax và e-mail phải giống nhau.
 
 
- Đề bài đã cập nhật dữ liệu rồi
+UPDATE khachhang 
+
+SET khachhang.DIACHI = nhacungcap.DIACHI, khachhang.DIENTHOAI = nhacungcap.DIENTHOAI, khachhang.FAX = nhacungcap.FAX, khachhang.EMAIL = nhacungcap.email 
+
+FROM nhacungcap
+
+WHERE khachhang.TENCONGTY = nhacungcap.TENCONGTY AND khachhang.TENGIAODICH = nhacungcap.TENGIAODICH
 
 
  37. Tăng lương lên gấp rưỡi cho những nhân viên bán được số lượng hàng nhiều hơn 100 trong năm 2006.
 
 
- UPDATE nhanvien, chitietdathang AS c SET LUONGCOBAN = LUONGCOBAN * 2 WHERE SOLUONG > 100
+ UPDATE nhanvien, chitietdathang AS c SET LUONGCOBAN = LUONGCOBAN * 1.5 WHERE SOLUONG > 100
 
  38. Tăng phụ cấp lên bằng 50% lương cho những nhân viên bán được hàng nhiều nhất.
 
@@ -215,8 +235,8 @@ FROM mathang WHERE maloaihang=loaihang.MALOAIHANG)
 
 45 Xoá khỏi bảng mathang những mặt hàng nào có số lượng bằng 0 và không được đặt mua trong bất kỳ đơn đặt hàng nào
     DELETE FROM mathang 
-WHERE SOLUONG = 0 
-AND NOT EXISTS (SELECT SOHOADON FROM chitietdathang WHERE MATHANG_MAHANG = mathang.NHACUNGCAP_MACONGTY)
+    WHERE SOLUONG = 0 
+    AND NOT EXISTS (SELECT SOHOADON FROM chitietdathang WHERE MATHANG_MAHANG = mathang.NHACUNGCAP_MACONGTY)
 
 
 
