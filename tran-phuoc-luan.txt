@@ -17,12 +17,16 @@
 
 5.	Mã và tên của các mặt hàng có giá trị lớn hơn 100000 và số lượng hiện có ít hơn 50
 
-    SELECT m.MAHANG, m.TENHANG FROM mathang AS m WHERE m.GIAHANG > 100000 AND m.SOLUONG < 50
+    SELECT m.MAHANG, m.TENHANG 
+    FROM mathang AS m WHERE m.GIAHANG > 100000 AND m.SOLUONG < 50
 
 6.	Cho biết mỗi mặt hàng trong công ty do ai cung cấp
 
     SELECT m.TENHANG, n.TENCONGTY 
     FROM mathang AS m, nhacungcap As n
+
+
+
 
 7.	Công ty Việt Tiến đã cung cấp những mặt hàng nào
 
@@ -35,29 +39,37 @@
 
 
     SELECT n.DIACHI, n.TENCONGTY 
-    FROM loaihang AS l, nhacungcap AS n WHERE l.MALOAIHANG = 'TP'
+    FROM loaihang AS l, nhacungcap AS n 
+    WHERE l.MALOAIHANG = 'TP'
 
 9.	Những khách hàng nào (tên giao dịch)(khachhang ) đã đặt mua mặt hàng(mathang) sữa hộp của công ty
-    SELECT k.TENGIAODICH 
+    SELECT k.TENGIAODICH AS TENKHACHHANG
     FROM khachhang AS k, mathang AS m WHERE m.TENHANG = 'SUA HOP'
 
 10.	Đơn đặt hàng số 1(dondadat) do ai đặt(khachhang) và do nhân viên nào lập(nhanvien), 
 thời gian và địa điểm giao hàng là ở đâu(dondadat)
 
-SELECT k.TENGIAODICH,k.DIACHI,d.NGAYDATHANG,d.NOIGIAOHANG 
-FROM dondathang AS d, khachhang AS k WHERE d.KHACHHANG_MAKHACHHANG = k.MAKHACHHANG AND d.NOIGIAOHANG = 'huế'
+SELECT k.TENGIAODICH,k.DIACHI,d.NGAYDATHANG,d.NOIGIAOHANG, n.TEN AS TENNHANVIEN FROM dondathang AS d, khachhang AS k,nhanvien AS n WHERE d.KHACHHANG_MAKHACHHANG = k.MAKHACHHANG 
+AND d.NOIGIAOHANG = 'huế' AND n.TEN = 'ANH'
 
 
 
 11.	Hãy cho biết số tiền lương mà công ty phải trả cho mỗi nhân viên là bao nhiêu (lương=lương cơ bản+phụ cấp)
 
-SELECT nhanvien.HO, nhanvien.TEN, nhanvien.LUONGCOBAN + nhanvien.LUONGPHUCAP FROM nhanvien
-13.	Hãy cho biết có những khách hàng nào lại chính là đối tác cung cấp hàng cho công ty (tức là có cùng tên giao dịch)
+SELECT nhanvien.HO, nhanvien.TEN, (nhanvien.LUONGCOBAN + nhanvien.LUONGPHUCAP ) AS TONGTIENLUONG
+FROM nhanvien
 
-SELECT k.TENGIAODICH 
+
+13.	Hãy cho biết có những khách hàng nào lại chính là đối tác cung cấp hàng cho công ty (tức là có cùng tên 
+giao dịch)
+
+SELECT k.TENGIAODICH AS TENKHACHHANG
 FROM khachhang AS k,nhacungcap AS n WHERE k.TENGIAODICH = n.TENGIAODICH
 
 
+
+
+----- Bắt đầu câu 14 khi tiếp tục ..... ------
 14.	Trong công ty có những nhân viên nào có cùng ngày sinh
 
 
@@ -67,7 +79,8 @@ INNER JOIN nhanvien b ON a.ngaysinh = b.ngaysinh AND a.MANHANVIEN <> b.MANHANVIE
 
 15.	Những đơn hàng nào yêu cầu giao hàng ngay tại công ty đặt hàng và những đơn đó là của công ty nào
 
-
+SELECT SOHOADON,TENCONGTY,TENGIAODICH 
+FROM dondathang INNER JOIN khachhang ON dondathang.NOIGIAOHANG = khachhang.DIACHI
 16.	Cho biết tên công ty, tên giao dịch, địa chỉ và điện thoại của các khách hàng và nhà cung cấp hàng cho công ty
 
 SELECT n.TENCONGTY, n.TENGIAODICH, n.DIACHI, n.DIENTHOAI, k.TENGIAODICH, k.DIACHI, k.DIENTHOAI, k.DIACHI 
@@ -78,27 +91,44 @@ FROM nhacungcap AS n, khachhang AS k
 
  
 
-
+SELECT TENHANG,MAHANG FROM mathang
+ WHERE NOT EXISTS(SELECT MATHANG_MAHANG FROM chitietdathang WHERE MATHANG_MAHANG = mathang.MAHANG)
 
 
 
 
 19.	Những nhân viên nào của công ty có lương cơ bản cao nhất\
-    SELECT n.HO, n.TEN, MAX(LUONGCOBAN) FROM nhanvien AS n
+    SELECT HO,TEN, MAX(LUONGCOBAN) FROM nhanvien WHERE LUONGCOBAN = (SELECT MAX(LUONGCOBAN) FROM nhanvien)
 
 
 20.	Tổng số tiền mà khách hàng phải trả cho mỗi đơn đặt hàng là bao nhiêu
 
 
-21.	Trong năm 2006 những mặt hàng nào đặt mua đúng mộ lần
+21.	Trong năm 2006 những mặt hàng nào đặt mua đúng một lần
 
 
 22.	Mỗi khách hàng phải bỏ ra bao nhiêu tiền để đặt mua hàng của công ty
 
 
+23.Mỗi nhân viên của công ty đã lập bao nhiêu đơn đặt hàng (nếu chưa hề lập hóa đơn nào thì cho kết quả là 0)
+
+
+24.Tổng số tiền hàng mà công ty thu được trong mỗi tháng của năm 2006 (thời gianđược tính theo ngày đặt hàng)
+
+
+25.Tông số tiền lời mà công ty thu được từ mỗi mặt hàng trong năm 2006
+
+
+26.Số lượng hàng còn lại của mỗi mặt hàng mà công ty đã có (tổng số lượng hànghiện có và đã bán)
+
+
+27.Nhân viên nào của công ty bán được số lượng hàng nhiều nhất và số lượng hàngbán được của mhữmg nhân viên này là bao nhiêu
+
 
 28.	Đơn đặt hàng nào có số lượng hàng được đặt mua ít nhất
-SELECT DONDATHANG_SOHOADON FROM chitietdathang AS c WHERE c.SOLUONG = 2
+SELECT DONDATHANG_SOHOADON 
+FROM chitietdathang AS c 
+WHERE c.SOLUONG = 2
 
 
 
@@ -114,7 +144,9 @@ SELECT GIABAN FROM chitietdathang AS c WHERE c.ID = 4
 
 31.	Mỗi một loại hàng bao gồm những mặt hàng nào(mathang), tổng số lượng của mỗi loại 
 và tổng số lượng của tất cả các mặt hàng hiện có trong cty
-
+    SELECT l.TENLOAIHANG, m.TENHANG 
+    FROM loaihang AS l, mathang AS m 
+    WHERE l.MALOAIHANG = m.LOAIHANG_MALOAIHANG
 
 
 
