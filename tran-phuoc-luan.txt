@@ -136,9 +136,10 @@ FROM mathang
     SELECT nhanvien.MANHANVIEN,ho,ten,sum(SOLUONG) AS TONGSOLUONG 
 
 
-    FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
+    FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN = dondathang.NHANVIEN_MANHANVIEN) 
     INNER JOIN chitietdathang ON dondathang.SOHOADON=chitietdathang.DONDATHANG_SOHOADON 
-    GROUP BY nhanvien.MANHANVIEN,ho,ten HAVING sum(soluong)>=ALL(SELECT sum(SOLUONG) FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
+    GROUP BY nhanvien.MANHANVIEN,ho,ten 
+    HAVING sum(soluong)>=ALL(SELECT sum(SOLUONG) FROM (nhanvien INNER JOIN dondathang ON nhanvien.MANHANVIEN=dondathang.NHANVIEN_MANHANVIEN) 
     INNER JOIN chitietdathang ON dondathang.SOHOADON=chitietdathang.DONDATHANG_SOHOADON GROUP BY nhanvien.MANHANVIEN,ho,ten)
 
 28.	Đơn đặt hàng nào có số lượng hàng được đặt mua ít nhất
@@ -160,6 +161,7 @@ SELECT GIABAN AS GIATRIDONHANG FROM chitietdathang AS c WHERE c.ID = 4
 
 31.	Mỗi một loại hàng bao gồm những mặt hàng nào(mathang), tổng số lượng của mỗi loại 
 và tổng số lượng của tất cả các mặt hàng hiện có trong cty
+
     SELECT l.TENLOAIHANG, m.TENHANG 
     FROM loaihang AS l, mathang AS m 
     WHERE l.MALOAIHANG = m.LOAIHANG_MALOAIHANG
@@ -219,7 +221,10 @@ WHERE khachhang.TENCONGTY = nhacungcap.TENCONGTY AND khachhang.TENGIAODICH = nha
  Thực hiện các yêu cầu dưới đây bằng câu lệnh DELETE.
 
 41. Xoá khỏi bảng NHANVIEN những nhân viên đã làm việc trong công ty quá 40 năm.
-Không hiểu đề
+
+ DELETE 
+ FROM nhanvien
+ WHERE DATEDIFF(YY,nhanvien.NGAYLAMVIEC,GETDATE())>40
 
 
 42. Xoá những đơn hàng đặt trước 2000 ra khỏi cơ sở dữ liệu 
@@ -232,7 +237,10 @@ FROM mathang WHERE maloaihang=loaihang.MALOAIHANG)
 
 44 xoá khỏi bảng khachhang những khach hàng hiện không có bất kỳ một đơn đặt hàng nào cho công ty 
 
-
+    DELETE 
+        FROM khachhang WHERE NOT EXISTS
+        (SELECT  FROM dondathang 
+        WHERE makhachhang = khachhang.MAKHACHHANG)
 45 Xoá khỏi bảng mathang những mặt hàng nào có số lượng bằng 0 và không được đặt mua trong bất kỳ đơn đặt hàng nào
     DELETE FROM mathang 
     WHERE SOLUONG = 0 
